@@ -1,9 +1,9 @@
-import { ExchangeRates } from "./types/ExchangeRates";
-import fetch from "node-fetch";
+import { ExchangeRates } from './types/ExchangeRates';
+import fetch from 'node-fetch';
 
-export async function getCurrencyData() {
+export async function getCurrencyData(data: string) {
   const response = await fetch(
-    "http://api.nbp.pl/api/exchangerates/rates/c/usd/2016-04-04/?format=json"
+    `http://api.nbp.pl/api/exchangerates/rates/c/usd/${data}/?format=json`
   );
   return (await response.json()) as ExchangeRates;
 }
