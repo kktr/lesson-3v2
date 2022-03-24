@@ -75,4 +75,43 @@ describe('currenciesApi', () => {
   });
 });
 
-// funkcja, która woła catch
+describe('currenciesApi tests only with jest', () => {
+  afterEach(jest.clearAllMocks);
+
+  const mockGetCurrencyData = jest.fn(
+    (data: string) =>
+      Promise.resolve({
+        table: 'C',
+        currency: 'dolar amerykański',
+        code: 'USD',
+        rates: [
+          {
+            no: '056/C/NBP/2022',
+            effectiveDate: data,
+            bid: data === '2022-03-22' ? 4.213 : 4.2585,
+            ask: data === '2022-03-22' ? 4.2982 : 4.3445,
+          },
+        ],
+      }) as unknown as ExchangeRates
+  );
+
+  it('returns correctly currencies for today ', async () => {
+    const data = await mockGetCurrencyData('2022-03-22');
+    expect(data.rates[0].bid).toBe(4.213);
+    expect(mockGetCurrencyData).toBeCalledTimes(1);
+  });
+
+  it('returns correctly currencies for 1 week ago', async () => {
+    const data = await mockGetCurrencyData('2022-03-15');
+    expect(data.rates[0].bid).toBe(4.2585);
+    expect(mockGetCurrencyData).toBeCalledTimes(1);
+  });
+
+  it('returns correctly calculate difference between currencies', async () => {
+    const dataToday = await mockGetCurrencyData('2022-03-22');
+    const dataOneWeekAgo = await mockGetCurrencyData('2022-03-15');
+
+    expect(calculateRateDifference(dataToday, dataOneWeekAgo)).toBe(-0.0455);
+    expect(mockGetCurrencyData).toBeCalledTimes(2);
+  });
+});
